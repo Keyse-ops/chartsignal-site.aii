@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChartElligence</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #0b0f19;
+  color: #ffffff;
+}
+
+.container {
+  max-width: 480px;
+  margin: 80px auto;
+  padding: 24px;
+  background: #121826;
+  border-radius: 16px;
+  box-shadow: 0 0 40px rgba(0,0,0,0.4);
+}
+
+h1 {
+  text-align: center;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 16px;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: #121826;
+  padding: 24px;
+  border-radius: 16px;
+  max-width: 420px;
+  width: 90%;
+}
+
+.address {
+  background: #0b0f19;
+  padding: 12px;
+  border-radius: 8px;
+  word-break: break-all;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.small {
+  font-size: 12px;
+  opacity: 0.8;
+  margin-top: 10px;
+}
+
+.timer {
+  margin-top: 12px;
+  font-weight: bold;
+  text-align: center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>ChartElligence</h1>
+  <p style="text-align:center">KI-gestützte Chart-Analyse</p>
+
+  <button onclick="openPayment()">Pay / Unlock Analysis</button>
+</div>
+
+<div class="modal" id="paymentModal">
+  <div class="modal-content">
+    <h2>Pay with Solana (SOL)</h2>
+
+    <p>
+      To unlock one chart analysis, copy the Solana wallet address below
+      and send the required amount of SOL using your Phantom Wallet.
+    </p>
+
+    <strong>Solana Wallet Address:</strong>
+    <div class="address" id="wallet">
+      2m51WSpBxZQHEqpS81znbLCZSDA1LTBkEJcHqaHv3Tc8
+    </div>
+
+    <button onclick="copyAddress()">Copy address</button>
+
+    <p class="small">
+      Only Solana (SOL) is accepted. Payments sent using any other network or token will be lost.
+    </p>
+
+    <p class="small">
+      This tool provides educational, probability-based chart analysis only.
+      Not financial advice. No guarantee of profit.
+    </p>
+
+    <button onclick="confirmPayment()">I have copied the address</button>
+
+    <div class="timer" id="timer"></div>
+  </div>
+</div>
+
+<script>
+function openPayment() {
+  document.getElementById("paymentModal").style.display = "flex";
+}
+
+function copyAddress() {
+  navigator.clipboard.writeText(
+    "2m51WSpBxZQHEqpS81znbLCZSDA1LTBkEJcHqaHv3Tc8"
+  );
+  alert("Address copied. Open Phantom Wallet and send SOL.");
+}
+
+function confirmPayment() {
+  let time = 120;
+  const timerEl = document.getElementById("timer");
+
+  const interval = setInterval(() => {
+    time--;
+    timerEl.textContent = "Please wait " + time + " seconds before uploading your chart.";
+    if (time <= 0) {
+      clearInterval(interval);
+      alert("You can now upload your chart (payment is not verified).");
+      document.getElementById("paymentModal").style.display = "none";
+    }
+  }, 1000);
+}
+</script>
+
+</body>
+</html>
+import React, { useState } from 'react';
+import { TrendingUp, Zap, Target, Lock, BarChart3, Globe } from 'lucide-react';
+
+const translations = {
+  en: {
+    selectLanguage: "Choose Your Language",
+    heroTitle1: "AI-Powered",
+    heroTitle2: "Trading Intelligence",
+    heroSubtitle: "Upload your chart and receive probability-based insights in seconds. Make informed decisions with advanced technical analysis.",
+    ctaButton: "Analyze Chart",
+    freeBadge: "1 FREE",
+    featuresTitle: "Why ChartElligence?",
+    feature1Title: "Instant Analysis",
+    feature1Desc: "Get probability-based insights within seconds of uploading your chart",
+    feature2Title: "Multi-Asset Support",
+    feature2Desc: "Analyze stocks, crypto, forex, and commodities with the same tool",
+    feature3Title: "Secure & Private",
+    feature3Desc: "Your charts are processed securely and never stored permanently",
+    feature4Title: "Probability Based",
+    feature4Desc: "Receive clear buy/sell probabilities, not absolute predictions",
+    feature5Title: "Educational Tool",
+    feature5Desc: "Learn technical analysis patterns through AI-assisted insights",
+    feature6Title: "Multilingual",
+    feature6Desc: "Available in English, German, French, and Spanish",
+    pricingTitle: "Simple Pricing",
+    plan1Name: "Single Analysis",
+    plan1Desc: "One-time chart analysis",
+    plan2Name: "10-Pack",
+    plan2Desc: "10 chart analyses (Save 37%)",
+    plan3Name: "Monthly Pro",
+    plan3Desc: "Unlimited analyses per month",
+    popularBadge: "MOST POPULAR",
+    planBtn: "Get Started",
+    freeTrialUsedTitle: "Free Trial Used",
+    freeTrialUsedText: "You've used your free analysis. Choose a plan to continue analyzing charts.",
+    viewPricing: "View Pricing Plans",
+    paymentTitle: "Pay with Solana (SOL)",
+    paymentInstruction: "To unlock one chart analysis, you must copy the Solana wallet address below and send the required amount of SOL using your Phantom Wallet.",
+    walletAddress: "Solana Wallet Address:",
+    paymentHelper: "Copy this address, open Phantom Wallet, and send SOL to this address.",
+    paymentWarning: "Only Solana (SOL) is accepted. Payments sent using any other network or token will be permanently lost.",
+    paymentDisclaimer: "This tool provides educational, probability-based chart analysis only. Not financial advice. No guarantee of profit.",
+    confirmPayment: "I have copied the address",
+    waitingMessage: "Please wait 2 minutes before uploading your chart.",
+    timeRemaining: "Time remaining:",
+    uploadTitle: "Upload Chart",
+    uploadDrag: "Drag & drop your chart here",
+    uploadOr: "or click to browse",
+    uploadFormats: "PNG, JPG • Max 10MB",
+    analyzing: "Analyzing your chart...",
+    resultTitle: "Analysis Complete",
+    buyProb: "BUY Probability",
+    sellProb: "SELL Probability",
+    disclaimerText: "Educational tool only. Not financial advice.",
+    analyzeAnother: "Analyze Another Chart",
+    footerRisk: "Trading and investing involve risk of loss. This tool provides educational analysis only and is not financial advice."
+  },
+  de: {
+    selectLanguage: "Sprache wählen",
+    heroTitle1: "KI-gestützte",
+    heroTitle2: "Trading-Intelligenz",
+    heroSubtitle: "Laden Sie Ihren Chart hoch und erhalten Sie sofort wahrscheinlichkeitsbasierte Einblicke.",
+    ctaButton: "Chart analysieren",
+    freeBadge: "1 GRATIS",
+    featuresTitle: "Warum ChartElligence?",
+    feature1Title: "Sofortige Analyse",
+    feature1Desc: "Wahrscheinlichkeitsbasierte Einblicke innerhalb von Sekunden",
+    feature2Title: "Multi-Asset",
+    feature2Desc: "Analysieren Sie Aktien, Krypto, Forex und Rohstoffe",
+    feature3Title: "Sicher & Privat",
+    feature3Desc: "Ihre Charts werden sicher verarbeitet",
+    feature4Title: "Wahrscheinlichkeitsbasiert",
+    feature4Desc: "Klare Kauf-/Verkaufswahrscheinlichkeiten",
+    feature5Title: "Bildungstool",
+    feature5Desc: "Lernen Sie technische Analysemuster",
+    feature6Title: "Mehrsprachig",
+    feature6Desc: "Verfügbar in 4 Sprachen",
+    pricingTitle: "Einfache Preise",
+    plan1Name: "Einzelanalyse",
+    plan1Desc: "Einmalige Chart-Analyse",
+    plan2Name: "10er-Pack",
+    plan2Desc: "10 Analysen (37% sparen)",
+    plan3Name: "Monatlich Pro",
+    plan3Desc: "Unbegrenzte Analysen",
+    popularBadge: "BELIEBT",
+    planBtn: "Loslegen",
+    freeTrialUsedTitle: "Gratisanalyse genutzt",
+    freeTrialUsedText: "Sie haben Ihre kostenlose Analyse verwendet.",
+    viewPricing: "Preispläne ansehen",
+    paymentTitle: "Mit Solana (SOL) bezahlen",
+    paymentInstruction: "Um eine Chart-Analyse freizuschalten, müssen Sie die unten stehende Solana Wallet-Adresse kopieren und den erforderlichen SOL-Betrag mit Ihrer Phantom Wallet senden.",
+    walletAddress: "Solana Wallet-Adresse:",
+    paymentHelper: "Kopieren Sie diese Adresse, öffnen Sie Phantom Wallet und senden Sie SOL an diese Adresse.",
+    paymentWarning: "Nur Solana (SOL) wird akzeptiert. Zahlungen über andere Netzwerke oder Token gehen dauerhaft verloren.",
+    paymentDisclaimer: "Dieses Tool bietet nur bildungsorientierte, wahrscheinlichkeitsbasierte Chart-Analysen. Keine Finanzberatung. Keine Gewinngarantie.",
+    confirmPayment: "Ich habe die Adresse kopiert",
+    waitingMessage: "Bitte warten Sie 2 Minuten, bevor Sie Ihren Chart hochladen.",
+    timeRemaining: "Verbleibende Zeit:",
+    uploadTitle: "Chart hochladen",
+    uploadDrag: "Chart hier ablegen",
+    uploadOr: "oder klicken",
+    uploadFormats: "PNG, JPG • Max 10MB",
+    analyzing: "Analysiere...",
+    resultTitle: "Analyse abgeschlossen",
+    buyProb: "KAUF-Wahrscheinlichkeit",
+    sellProb: "VERKAUF-Wahrscheinlichkeit",
+    disclaimerText: "Nur Bildungstool. Keine Finanzberatung.",
+    analyzeAnother: "Weiteren Chart analysieren",
+    footerRisk: "Trading birgt Verlustrisiken. Dies ist keine Finanzberatung."
+  },
+  fr: {
+    selectLanguage: "Choisissez votre langue",
+    heroTitle1: "Analyse IA",
+    heroTitle2: "Trading Intelligent",
+    heroSubtitle: "Téléchargez votre graphique et recevez des insights en secondes.",
+    ctaButton: "Analyser",
+    freeBadge: "1 GRATUIT",
+    featuresTitle: "Pourquoi ChartElligence?",
+    feature1Title: "Analyse instantanée",
+    feature1Desc: "Insights en quelques secondes",
+    feature2Title: "Multi-actifs",
+    feature2Desc: "Actions, crypto, forex, matières premières",
+    feature3Title: "Sécurisé",
+    feature3Desc: "Vos graphiques sont traités en sécurité",
+    feature4Title: "Probabilités",
+    feature4Desc: "Probabilités claires d'achat/vente",
+    feature5Title: "Éducatif",
+    feature5Desc: "Apprenez l'analyse technique",
+    feature6Title: "Multilingue",
+    feature6Desc: "Disponible en 4 langues",
+    pricingTitle: "Tarifs simples",
+    plan1Name: "Analyse unique",
+    plan1Desc: "Une analyse",
+    plan2Name: "Pack de 10",
+    plan2Desc: "10 analyses (Économisez 37%)",
+    plan3Name: "Pro mensuel",
+    plan3Desc: "Analyses illimitées",
+    popularBadge: "POPULAIRE",
+    planBtn: "Commencer",
+    freeTrialUsedTitle: "Essai utilisé",
+    freeTrialUsedText: "Vous avez utilisé votre analyse gratuite.",
+    viewPricing: "Voir les tarifs",
+    paymentTitle: "Payer avec Solana (SOL)",
+    paymentInstruction: "Pour débloquer une analyse de graphique, vous devez copier l'adresse du portefeuille Solana ci-dessous et envoyer le montant requis de SOL en utilisant votre Phantom Wallet.",
+    walletAddress: "Adresse du portefeuille Solana:",
+    paymentHelper: "Copiez cette adresse, ouvrez Phantom Wallet et envoyez SOL à cette adresse.",
+    paymentWarning: "Seul Solana (SOL) est accepté. Les paiements envoyés via d'autres réseaux ou tokens seront définitivement perdus.",
+    paymentDisclaimer: "Cet outil fournit une analyse de graphique éducative basée sur les probabilités uniquement. Pas un conseil financier. Aucune garantie de profit.",
+    confirmPayment: "J'ai copié l'adresse",
+    waitingMessage: "Veuillez attendre 2 minutes avant de télécharger votre graphique.",
+    timeRemaining: "Temps restant:",
+    uploadTitle: "Télécharger",
+    uploadDrag: "Déposez votre graphique ici",
+    uploadOr: "ou cliquez",
+    uploadFormats: "PNG, JPG • Max 10MB",
+    analyzing: "Analyse en cours...",
+    resultTitle: "Analyse terminée",
+    buyProb: "Probabilité ACHAT",
+    sellProb: "Probabilité VENTE",
+    disclaimerText: "Outil éducatif uniquement. Pas un conseil financier.",
+    analyzeAnother: "Analyser un autre",
+    footerRisk: "Le trading comporte des risques. Ceci n'est pas un conseil financier."
+  },
+  es: {
+    selectLanguage: "Elija su idioma",
+    heroTitle1: "Análisis IA",
+    heroTitle2: "Trading Inteligente",
+    heroSubtitle: "Suba su gráfico y reciba insights en segundos.",
+    ctaButton: "Analizar",
+    freeBadge: "1 GRATIS",
+    featuresTitle: "¿Por qué ChartElligence?",
+    feature1Title: "Análisis instantáneo",
+    feature1Desc: "Insights en segundos",
+    feature2Title: "Multi-activos",
+    feature2Desc: "Acciones, cripto, forex, materias primas",
+    feature3Title: "Seguro",
+    feature3Desc: "Sus gráficos se procesan de forma segura",
+    feature4Title: "Probabilidades",
+    feature4Desc: "Probabilidades claras de compra/venta",
+    feature5Title: "Educativo",
+    feature5Desc: "Aprenda análisis técnico",
+    feature6Title: "Multilingüe",
+    feature6Desc: "Disponible en 4 idiomas",
+    pricingTitle: "Precios simples",
+    plan1Name: "Análisis único",
+    plan1Desc: "Un análisis",
+    plan2Name: "Paquete de 10",
+    plan2Desc: "10 análisis (Ahorre 37%)",
+    plan3Name: "Pro mensual",
+    plan3Desc: "Análisis ilimitados",
+    popularBadge: "POPULAR",
+    planBtn: "Comenzar",
+    freeTrialUsedTitle: "Prueba usada",
+    freeTrialUsedText: "Has usado tu análisis gratuito.",
+    viewPricing: "Ver precios",
+    paymentTitle: "Pagar con Solana (SOL)",
+    paymentInstruction: "Para desbloquear un análisis de gráfico, debe copiar la dirección de billetera Solana a continuación y enviar la cantidad requerida de SOL usando su Phantom Wallet.",
+    walletAddress: "Dirección de billetera Solana:",
+    paymentHelper: "Copie esta dirección, abra Phantom Wallet y envíe SOL a esta dirección.",
+    paymentWarning: "Solo se acepta Solana (SOL). Los pagos enviados usando otra red o token se perderán permanentemente.",
+    paymentDisclaimer: "Esta herramienta proporciona análisis de gráficos educativo basado en probabilidades únicamente. No es asesoramiento financiero. Sin garantía de beneficios.",
+    confirmPayment: "He copiado la dirección",
+    waitingMessage: "Por favor espere 2 minutos antes de subir su gráfico.",
+    timeRemaining: "Tiempo restante:",
+    uploadTitle: "Subir gráfico",
+    uploadDrag: "Arrastra tu gráfico aquí",
+    uploadOr: "o haz clic",
+    uploadFormats: "PNG, JPG • Máx 10MB",
+    analyzing: "Analizando...",
+    resultTitle: "Análisis completado",
+    buyProb: "Probabilidad COMPRA",
+    sellProb: "Probabilidad VENTA",
+    disclaimerText: "Herramienta educativa únicamente. No es asesoramiento financiero.",
+    analyzeAnother: "Analizar otro",
+    footerRisk: "El trading implica riesgo. Esto no es asesoramiento financiero."
+  }
+};
+
+const SOLANA_WALLET = "2m51WSpBxZQHEqpS81znbLCZSDA1LTBkEJcHqaHv3Tc8";
+
+function Modal({ children, onClose }) {
+  return (
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50" onClick={onClose}>
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-slate-700" onClick={(e) => e.stopPropagation()}>
+        <button onClick={onClose} className="float-right text-slate-400 hover:text-white text-3xl leading-none -mt-2 -mr-2">×</button>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+export default function ChartElligence() {
+  const [lang, setLang] = useState(null);
+  const [freeTrialUsed, setFreeTrialUsed] = useState(false);
+  const [showModal, setShowModal] = useState(null);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [results, setResults] = useState(null);
+  const [waitingPayment, setWaitingPayment] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState(120);
+
+  const t = lang ? translations[lang] : translations.en;
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(SOLANA_WALLET);
+    alert('Address copied to clipboard!');
+  };
+
+  const handlePaymentConfirm = () => {
+    setWaitingPayment(true);
+    setTimeRemaining(120);
+    
+    const timer = setInterval(() => {
+      setTimeRemaining((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setWaitingPayment(false);
+          setShowModal('upload');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const handleFileUpload = (file) => {
+    if (!file) return;
+    const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+    if (!validTypes.includes(file.type)) {
+      alert('Please upload PNG or JPG');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File must be less than 10MB');
+      return;
+    }
+    if (!freeTrialUsed) setFreeTrialUsed(true);
+    setAnalyzing(true);
+    setTimeout(() => {
+      const buyProb = Math.floor(Math.random() * 40) + 30;
+      setResults({ buy: buyProb, sell: 100 - buyProb });
+      setAnalyzing(false);
+      setShowModal('result');
+    }, 3000);
+  };
+
+  if (!lang) {
+    return (
+      <div className="fixed inset-0 bg-slate-950 flex items-center justify-center p-4">
+        <div className="bg-gradient-to-br from-slate-800 to-slate-900 p-12 rounded-3xl max-w-md w-full text-center border border-slate-700">
+          <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">{t.selectLanguage}</h2>
+          <div className="grid grid-cols-2 gap-4 mt-8">
+            {[
+              { code: 'en', flag: '🇬🇧', name: 'English' },
+              { code: 'de', flag: '🇩🇪', name: 'Deutsch' },
+              { code: 'fr', flag: '🇫🇷', name: 'Français' },
+              { code: 'es', flag: '🇪🇸', name: 'Español' }
+            ].map((l) => (
+              <button key={l.code} onClick={() => setLang(l.code)} className="p-4 bg-slate-700/50 border-2 border-slate-600 rounded-xl hover:border-blue-500 hover:bg-blue-500/10 transition-all text-lg font-semibold">
+                <div className="text-3xl mb-2">{l.flag}</div>
+                {l.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100">
+      <nav className="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-lg border-b border-slate-800">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">ChartElligence</div>
+          <button onClick={() => setLang(null)} className="px-4 py-2 bg-blue-500/20 border border-blue-500/50 rounded-lg text-blue-400 font-semibold hover:bg-blue-500/30 transition-colors">{lang.toUpperCase()} ▼</button>
+        </div>
+      </nav>
+
+      <section className="py-20 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6">
+            {t.heroTitle1}<br />
+            <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">{t.heroTitle2}</span>
+          </h1>
+          <p className="text-xl text-slate-400 mb-8 max-w-2xl mx-auto">{t.heroSubtitle}</p>
+          <button onClick={() => setShowModal(freeTrialUsed ? 'freeTrial' : 'upload')} className="px-12 py-4 bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl text-lg font-semibold hover:shadow-xl hover:shadow-blue-500/30 transition-all inline-flex items-center gap-3">
+            {t.ctaButton}
+            <span className="px-3 py-1 bg-green-500 rounded-full text-sm">{t.freeBadge}</span>
+          </button>
+          <div className="flex justify-center gap-16 mt-16 flex-wrap">
+            <div className="text-center"><div className="text-4xl font-bold text-blue-400">50K+</div><div className="text-slate-500 text-sm mt-1">Charts Analyzed</div></div>
+            <div className="text-center"><div className="text-4xl font-bold text-blue-400">24/7</div><div className="text-slate-500 text-sm mt-1">Instant Results</div></div>
+            <div className="text-center"><div className="text-4xl font-bold text-blue-400">95%</div><div className="text-slate-500 text-sm mt-1">Satisfaction</div></div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 px-6 bg-slate-900/50">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-16">{t.featuresTitle}</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { icon: <Zap className="w-8 h-8" />, title: t.feature1Title, desc: t.feature1Desc },
+              { icon: <Target className="w-8 h-8" />, title: t.feature2Title, desc: t.feature2Desc },
+              { icon: <Lock className="w-8 h-8" />, title: t.feature3Title, desc: t.feature3Desc },
+              { icon: <BarChart3 className="w-8 h-8" />, title: t.feature4Title, desc: t.feature4Desc },
+              { icon: <TrendingUp className="w-8 h-8" />, title: t.feature5Title, desc: t.feature5Desc },
+              { icon: <Globe className="w-8 h-8" />, title: t.feature6Title, desc: t.feature6Desc }
+            ].map((feature, i) => (
+              <div key={i} className="p-8 bg-slate-800/50 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-all">
+                <div className="w-14 h-14 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-400 mb-4">{feature.icon}</div>
+                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                <p className="text-slate-400">{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-16">{t.pricingTitle}</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { name: t.plan1Name, price: '$3', desc: t.plan1Desc },
+              { name: t.plan2Name, price: '$19', desc: t.plan2Desc, popular: true },
+              { name: t.plan3Name, price: '$29', desc: t.plan3Desc }
+            ].map((pricing, i) => (
+              <div key={i} className={`p-8 rounded-2xl border ${pricing.popular ? 'border-blue-500 bg-blue-500/5' : 'border-slate-700 bg-slate-800/50'} relative`}>
+                {pricing.popular && <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-blue-600 to-blue-700 rounded-full text-sm font-bold">{t.popularBadge}</div>}
+                <h3 className="text-xl font-bold mb-2">{pricing.name}</h3>
+                <div className="text-5xl font-bold text-blue-400 mb-2">{pricing.price}</div>
+                <p className="text-slate-400 mb-6">{pricing.desc}</p>
+                <button onClick={() => setShowModal('payment')} className="w-full py-3 bg-blue-500/20 border-2 border-blue-500 rounded-xl font-semibold hover:bg-blue-500 hover:text-white transition-all">{t.planBtn}</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <footer className="py-12 px-6 bg-slate-900 border-t border-slate-800">
+        <div className="max-w-7xl mx-auto text-center text-slate-500 text-sm">
+          <p className="mb-2">© 2026 ChartElligence. All rights reserved.</p>
+          <p>{t.footerRisk}</p>
+        </div>
+      </footer>
+
+      {showModal === 'freeTrial' && (
+        <Modal onClose={() => setShowModal(null)}>
+          <h3 className="text-2xl font-bold mb-4">{t.freeTrialUsedTitle}</h3>
+          <p className="text-slate-400 mb-6">{t.freeTrialUsedText}</p>
+          <button onClick={() => setShowModal(null)} className="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl font-semibold">{t.viewPricing}</button>
+        </Modal>
+      )}
+
+      {showModal === 'payment' && (
+        <Modal onClose={() => setShowModal(null)}>
+          <h3 className="text-2xl font-bold mb-6">{t.paymentTitle}</h3>
+          
+          {!waitingPayment ? (
+            <>
+              <p className="text-slate-300 mb-6 leading-relaxed">{t.paymentInstruction}</p>
+              
+              <div className="mb-6">
+                <div className="text-sm font-semibold text-slate-400 mb-2">{t.walletAddress}</div>
+                <div className="flex items-center gap-2 bg-slate-800 p-4 rounded-lg border border-slate-700">
+                  <code className="flex-1 text-sm text-blue-400 break-all">{SOLANA_WALLET}</code>
+                  <button onClick={copyToClipboard} className="px-3 py-2 bg-blue-500/20 border border-blue-500 rounded-lg text-blue-400 text-sm font-semibold hover:bg-blue-500/30 transition-colors whitespace-nowrap">Copy</button>
+                </div>
+                <p className="text-slate-400 text-sm mt-2">{t.paymentHelper}</p>
+              </div>
+
+              <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/50 rounded-lg">
+                <p className="text-sm text-yellow-200">{t.paymentWarning}</p>
+              </div>
+
+              <div className="mb-6 p-4 bg-slate-800/50 border border-slate-700 rounded-lg">
+                <p className="text-xs text-slate-400">{t.paymentDisclaimer}</p>
+              </div>
+
+              <button onClick={handlePaymentConfirm} className="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl font-semibold hover:shadow-lg transition-all">{t.confirmPayment}</button>
+            </>
+          ) : (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+              <p className="text-slate-300 text-lg mb-4">{t.waitingMessage}</p>
+              <div className="text-4xl font-bold text-blue-400 mb-2">
+                {Math.floor(timeRemaining / 60)}:{String(timeRemaining % 60).padStart(2, '0')}
+              </div>
+              <p className="text-slate-500 text-sm">{t.timeRemaining}</p>
+            </div>
+          )}
+        </Modal>
+      )}
+
+      {showModal === 'upload' && (
+        <Modal onClose={() => setShowModal(null)}>
+          <h3 className="text-2xl font-bold mb-6">{t.uploadTitle}</h3>
+          {!analyzing ? (
+            <label className="block border-3 border-dashed border-slate-600 rounded-2xl p-12 text-center cursor-pointer hover:border-blue-500 hover:bg-blue-500/5 transition-all">
+              <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e.target.files[0])} />
+              <div className="text-6xl mb-4">📊</div>
+              <div className="text-lg font-semibold mb-2">{t.uploadDrag}</div>
+              <div className="text-slate-400 mb-2">{t.uploadOr}</div>
+              <div className="text-slate-500 text-sm">{t.uploadFormats}</div>
+            </label>
+          ) : (
+            <div className="text-center py-12">
+              <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-slate-400">{t.analyzing}</p>
+            </div>
+          )}
+        </Modal>
+      )}
+
+      {showModal === 'result' && results && (
+        <Modal onClose={() => setShowModal(null)}>
+          <h3 className="text-2xl font-bold mb-8">{t.resultTitle}</h3>
+          <div className="grid grid-cols-2 gap-4 mb-8">
+            <div className="p-6 bg-green-500/10 border-2 border-green-500 rounded-2xl">
+              <div className="text-sm font-semibold mb-2">{t.buyProb}</div>
+              <div className="text-5xl font-bold text-green-500">{results.buy}%</div>
+            </div>
+            <div className="p-6 bg-slate-700/50 border-2 border-slate-600 rounded-2xl">
+              <div className="text-sm font-semibold mb-2">{t.sellProb}</div>
+              <div className="text-5xl font-bold text-slate-400">{results.sell}%</div>
+            </div>
+          </div>
+          <div className="p-6 bg-yellow-500/10 border-2 border-yellow-500/50 rounded-xl mb-6">
+            <p className="text-sm text-yellow-200">{t.disclaimerText}</p>
+          </div>
+          <button onClick={() => { setShowModal('upload'); setResults(null); }} className="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl font-semibold">{t.analyzeAnother}</button>
+        </Modal>
+      )}
+    </div>
+  );
+}
